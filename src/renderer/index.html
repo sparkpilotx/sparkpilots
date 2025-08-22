@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>%VITE_APP_NAME%</title>
+    <meta name="color-scheme" content="light dark" />
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' http: https: data: blob: ws:"
@@ -13,6 +14,19 @@
     />
     <link rel="icon" type="image/png" sizes="256x256" href="/logo/256x256.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/logo/512x512.png" />
+    <style>
+      html {
+        background-color: #ffffff;
+      }
+      @media (prefers-color-scheme: dark) {
+        html {
+          background-color: #121212;
+        }
+      }
+      body {
+        background-color: transparent;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

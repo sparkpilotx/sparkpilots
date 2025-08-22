@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron/main'
 import { shell } from 'electron/common'
 import { platform, is } from '@electron-toolkit/utils'
 import { createAppTray, destroyAppTray } from './tray'
+import { setupAppearanceIpc } from './appearance'
 import { ensureDatabaseConnection } from './prisma'
 import { startTrpcServer, stopTrpcServer } from './trpc/server'
 
@@ -80,6 +81,9 @@ app.whenReady().then(async () => {
 
   // Create system tray with dynamic windows menu
   createAppTray()
+
+  // Appearance: follow system and notify renderers
+  setupAppearanceIpc()
 
   // Appearance persistence and sync removed in this iteration
 

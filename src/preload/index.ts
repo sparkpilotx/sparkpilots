@@ -15,16 +15,7 @@
 
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge } from 'electron'
-
-// Early appearance application to minimize FOUC
-try {
-  const prefersDark =
-    typeof window !== 'undefined' && 'matchMedia' in window
-      ? window.matchMedia('(prefers-color-scheme: dark)').matches
-      : false
-  document.documentElement.classList.toggle('dark', Boolean(prefersDark))
-  ;(document.documentElement as HTMLElement).style.colorScheme = prefersDark ? 'dark' : 'light'
-} catch {}
+import { AppearanceSnapshotSchema, type AppearanceSnapshot } from '@shared/appearance'
 
 /**
  * Extended Electron API combining standard functionality with custom features.
@@ -50,6 +41,20 @@ try {
  */
 const xAPI = {
   ...electronAPI,
+  appearance: {
+    get: async (): Promise<AppearanceSnapshot> => {
+      const raw: unknown = await electronAPI.ipcRenderer.invoke('appearance:get')
+      return AppearanceSnapshotSchema.parse(raw)
+    },
+    onUpdated: (callback: (snapshot: AppearanceSnapshot) => void): (() => void) => {
+      const listener = (_: unknown, raw: unknown): void => {
+        const snap = AppearanceSnapshotSchema.safeParse(raw)
+        if (snap.success) callback(snap.data)
+      }
+      electronAPI.ipcRenderer.on('appearance:updated', listener)
+      return () => electronAPI.ipcRenderer.removeListener('appearance:updated', listener)
+    },
+  },
 }
 
 /**
@@ -73,3 +78,11 @@ const xAPI = {
  * @throws {Error} If contextBridge is unavailable or contextIsolation is disabled
  */
 contextBridge.exposeInMainWorld('xAPI', xAPI)
+
+// Apply dark class as early as possible to avoid flash (FOUC)
+try {
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  if (prefersDark) {
+    document.documentElement.classList.add('dark')
+  }
+} catch {}

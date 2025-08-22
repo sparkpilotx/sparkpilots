@@ -11,7 +11,7 @@
  */
 
 import type { ElectronAPI } from '@electron-toolkit/preload';
-import type { AppearanceSnapshot, ThemeSource } from '@shared/appearance';
+import type { AppearanceSnapshot } from '@shared/appearance';
 
 declare global {
   interface Window {
@@ -43,6 +43,12 @@ declare global {
      * Direct Node.js access is blocked to prevent security vulnerabilities.
      */
     xAPI: ElectronAPI & {
+      appearance: {
+        get: () => Promise<AppearanceSnapshot>;
+        onUpdated: (
+          callback: (snapshot: AppearanceSnapshot) => void
+        ) => () => void;
+      };
     };
   }
 }

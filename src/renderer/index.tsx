@@ -6,6 +6,22 @@ import { queryClient } from '@/lib/trpc'
 import type { WindowType } from '@shared/window-types'
 
 import './src/styles/globals.css'
+function applyDarkClass(shouldUseDark: boolean): void {
+  const root = document.documentElement
+  if (shouldUseDark) root.classList.add('dark')
+  else root.classList.remove('dark')
+}
+
+// Initialize appearance from main via preload, then subscribe to changes
+void (async () => {
+  try {
+    const snap = await window.xAPI.appearance.get()
+    applyDarkClass(snap.shouldUseDarkColors)
+  } catch {}
+  window.xAPI.appearance.onUpdated((snap) => {
+    applyDarkClass(snap.shouldUseDarkColors)
+  })
+})()
 
 /**
  * Initialize the React application in the renderer process.

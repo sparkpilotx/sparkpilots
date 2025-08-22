@@ -1,4 +1,4 @@
-import { BaseWindow, WebContentsView } from 'electron/main'
+import { BaseWindow, WebContentsView, nativeTheme } from 'electron/main'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import type { WindowType, WindowConfig } from '@shared/window-types'
@@ -29,6 +29,8 @@ export const createWindow = (config: WindowConfig): BaseWindow => {
     width: config.width,
     height: config.height,
     title: config.title,
+    show: false,
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#121212' : '#ffffff',
     resizable: false,
     minimizable: true,
     maximizable: false,
@@ -60,6 +62,9 @@ export const createWindow = (config: WindowConfig): BaseWindow => {
         view.webContents.openDevTools({ mode: 'detach' })
       } catch {}
     }
+  })
+
+  view.webContents.once('did-finish-load', () => {
     window.show()
   })
 
