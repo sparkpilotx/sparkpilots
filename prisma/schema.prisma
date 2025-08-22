@@ -1,0 +1,29 @@
+// Prisma schema for SparkPilot
+// Datasource uses local PostgreSQL via MAIN_VITE_POSTGRES_URL from .env.local
+
+generator client {
+  provider   = "prisma-client-js"
+  // Explicitly use Node-API engine for Electron compatibility
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("MAIN_VITE_POSTGRES_URL")
+}
+
+model Idea {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Preferences {
+  id          String   @id @default("singleton")
+  themeSource String   @default("system")
+  updatedAt   DateTime @updatedAt
+}
+
+

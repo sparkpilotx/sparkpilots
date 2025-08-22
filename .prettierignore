@@ -1,0 +1,16 @@
+node_modules
+out
+dist
+build
+references/**
+context-engineering/**
+.cursor/**
+.gemini/**
+**/*.png
+**/*.ico
+**/*.icns
+**/*.svg
+**/*.d.ts
+src/renderer/src/components/ui/**
+
+

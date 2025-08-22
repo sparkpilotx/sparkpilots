@@ -1,0 +1,148 @@
+---
+globs: src/renderer/src/**/*.tsx
+alwaysApply: false
+---
+Component authoring rules (renderer)
+
+
+
+## Component typing
+
+- Prefer explicit props and explicit return types over React.FC.
+  - Do: `type Props = {}; const Component = ({}: Props): React.JSX.Element => { ... }`
+  - Avoid: `const Component: React.FC<Props> = (props) => { ... }`
+  - Rationale: prevents implicit children, simplifies generics, avoids redundancy with TS 5 + React 19.
+
+- Only accept `children` when needed.
+  - Do: `type Props = { children: React.ReactNode }` explicitly.
+
+## State management hierarchy
+
+1) Local component state
+- Use `useState` for simple cases; `useReducer` for complex transitions.
+
+2) Feature-scope state
+- Prefer React Context within a feature to avoid prop drilling beyond 2 levels.
+
+3) Global app state
+- Use Zustand with slice-based architecture.
+- Prefer atomic selectors and `shallow` comparisons for object selections.
+- Middleware: compose `devtools(persist(subscribeWithSelector(immer())))` when persistence is necessary. Persist only minimal state.
+
+4) Main process integration
+- Communicate via IPC exposed by preload only; never use Node APIs directly in the renderer.
+- Validate all IPC payloads with Zod schemas at the boundary.
+- Treat main-process data as async; include loading and error states in UI.
+
+## UI, styling, and accessibility
+
+- TailwindCSS v4 + shadcn/ui primitives where they add value (Dialog, Popover, Tooltip, etc.).
+- Use CVA + tailwind-merge for component variants.
+- Rely on Radix primitives; ensure ARIA compliance and keyboard navigation parity.
+- Ensure `.app-region-drag`/`.app-region-no-drag` on window chrome to avoid drag conflicts.
+- Single source of truth for theming: all colors, radii, spacing tokens, and semantic roles come from `src/renderer/src/styles/globals.css`.
+  - Use CSS variables (e.g., `bg-background`, `text-foreground`, `text-destructive`, `ring`, `border`) exposed there.
+  - Do not hardcode colors in components; prefer semantic tokens and Tailwind utilities bound to globals.css.
+  - If a token is missing, add it to `globals.css` rather than inlining styles.
+
+### Typography & spacing
+- Limit the typography scale to ~5 sizes/weights for hierarchy; use `text-xs` for captions/meta.
+- Use spacing in multiples of 4 for padding/margins to maintain rhythm.
+- Prefer semantic class names tied to tokens over arbitrary values.
+
+### CVA conventions
+- Variant names: `variant` (intent: `primary`, `secondary`, `outline`, `ghost`), `size` (`sm`, `md`, `lg`).
+- Keep CVA base classes token-driven (e.g., `bg-background`, `text-foreground`, `ring`).
+- Merge with `cn()`; do not concatenate ad‑hoc strings that duplicate token values.
+
+### shadcn/ui integration policy
+- Use shadcn/ui (Radix-backed) for complex interactive widgets (Dialog, Popover, Tooltip, DropdownMenu, Menubar, Tabs, ToggleGroup, ScrollArea, Select, Toast).
+- Simple controls (Button, Input, SectionHeader, Card) may use thin project wrappers tied to globals.css tokens and CVA.
+
+### Accessibility & interactions
+- Semantic HTML first; add ARIA where needed. Preserve focus visibility using `ring` tokens.
+- Provide loading and skeleton states (`animate-pulse`) for async UI.
+- Keep hover/active states subtle and token-aligned; avoid excessive shadows.
+
+### Electron/macOS specifics
+- Use `.app-region-drag` only on non-interactive chrome; wrap interactive zones with `.app-region-no-drag`.
+- Keep interactions consistent and responsive; avoid patterns that fight window drag.
+
+## Clarity & reuse
+
+- Factor repeated UI into reusable components once a pattern appears ≥2–3 times.
+- Prefer composition: small presentational components composed by thin containers.
+- Co-locate feature-specific components under the owning window/feature directory.
+- Keep cross-feature primitives under `src/renderer/src/components/` and tie styles to globals.css tokens.
+
+## Simplicity & composition
+
+- Keep components small and single-responsibility; avoid prop explosions and deep conditionals.
+- Extract logic to hooks (`src/renderer/src/hooks/`) and helpers (`src/renderer/src/lib/`).
+- Avoid inline styles; rely on Tailwind utilities and CVA variants bound to globals.css tokens.
+- Don’t overuse memoization; add `memo`/`useMemo` only after profiling.
+
+## Component layering
+
+- Primitives (token-bound): simple controls adhering to globals.css tokens, implemented with CVA + Tailwind; no feature-specific logic or references.
+- Compound (accessibility-heavy): complex widgets should use accessible primitives or library-backed components; wrap only to align tokens or integrate app-region rules.
+- Feature modules: assemble primitives/compound components; business logic and data wiring live here.
+- Window chrome: owns `.app-region-*`, layout, and menu affordances; no business logic.
+
+## Variants & CVA design
+
+- Standardize CVA props: `variant` (primary | secondary | outline | ghost), `size` (sm | md | lg).
+- Base classes must be token-driven (`bg-background`, `text-foreground`, `ring`, `border`).
+- Use `cn()` to merge classes; never duplicate token values with hardcoded colors.
+- Keep variant matrices minimal—remove unused variants/sizes.
+
+## Async UX & errors
+
+- Loading: use skeletons or `animate-pulse`; disable actions via `disabled` states.
+- Error: show concise, token-aligned error styles (`text-destructive`, `bg-destructive/10`).
+- Boundaries: isolate risky areas with error boundaries; fail soft where possible.
+
+## Review checklist (must-pass)
+
+- Styling only uses globals.css tokens (no hardcoded colors/radii/shadows).
+- Spacing follows 4px grid; typography scale ≤5 sizes; captions use `text-xs`.
+- CVA used for multi-state visuals with `variant`/`size` conventions.
+- No `.app-region-drag` on interactive controls; `.app-region-no-drag` applied correctly.
+- Repeated UI factored; feature code lives under its feature folder.
+- Accessible semantics present; complex widgets use Radix/shadcn when needed.
+
+## Forbidden patterns
+
+- `React.FC`
+- Browser `localStorage` for app data (team policy). Prefer IPC to main for durable storage.
+- Manual `memo`/`useMemo` without profiling evidence.
+- Class components.
+- CommonJS `require`/`module.exports` in renderer (ESM-only).
+
+## Required patterns
+
+- Functional components with hooks, explicit TypeScript types.
+- Immutable state updates and pure render functions.
+- Error boundaries for isolating rendering failures where appropriate.
+- Kebab-case filenames; English-only identifiers and comments.
+
+## File organization
+
+- Components: `src/renderer/src/components/`
+- Hooks: `src/renderer/src/hooks/`
+- Utilities: `src/renderer/src/lib/`
+- Styles: `src/renderer/src/styles/`
+
+## Example: component typing
+
+```typescript
+interface ButtonProps {
+  text: string;
+  onClick: () => void;
+}
+
+const Button = ({ text, onClick }: ButtonProps): React.JSX.Element => {
+  return <button onClick={onClick}>{text}</button>;
+};
+```
+

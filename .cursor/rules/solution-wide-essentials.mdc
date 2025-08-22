@@ -1,0 +1,69 @@
+---
+alwaysApply: true
+---
+
+# Objectives
+- Build a **tray-triggered**, **multi-window** Electron app with a consistent, responsive UX.
+- Keep the stack stable with pinned versions and strict security defaults.
+- Ship notarized releases with crash reporting and optional auto-updates.
+
+# Core Stack (Pinned)
+- **TypeScript** `5.8.3` (pinned for stability)
+- **Electron** `37` + **electron-builder** `26`
+- **Vite** `7` + **Electron-Vite** `4` (fast HMR)
+- **React** `19`
+- **Zod** `3.25.67` (runtime validation)
+
+> Do not upgrade these without an explicit migration plan and changelog review.
+
+# Scripts (Authoritative)
+- `npm run lint` → ESLint (`--max-warnings=0`)
+- `npm run lint:fix` → ESLint (`--fix`)
+- `npm run format` → Prettier write
+- `npm run format:check` → Prettier check
+- `npm run db:generate` → Prisma generate (loads `.env.local` via dotenv-cli)
+- `npm run db:migrate` → Prisma migrate dev (loads `.env.local`)
+- `npm run db:reset` → Prisma reset (loads `.env.local`)
+- `npm run db:studio` → Prisma Studio (loads `.env.local`)
+
+# UI & Styling
+- **TailwindCSS v4** + **shadcn/ui** primitives.
+- Use **class-variance-authority (CVA)** + **tailwind-merge** for component variants.
+- Provide `.app-region-drag` and `.app-region-no-drag` utilities to prevent window drag conflicts.
+- Accessibility: rely on **Radix** primitives; ensure ARIA compliance and keyboard navigation parity.
+
+# Security Defaults
+- BrowserWindow hardening: `contextIsolation: true`, `sandbox: true`, `nodeIntegration: false`.
+- Enforce CSP: `default-src 'self'` (expand only with explicit justification).
+- Preload: expose **minimal** APIs only; validate all inputs with **Zod**.
+- Audit prod dependencies; keep Electron/React pinned to avoid ABI drift.
+
+# Data & Prisma
+- Prisma client runs only in main: see `src/main/prisma.ts`. Do not import in renderer.
+- Datasource URL: `MAIN_VITE_POSTGRES_URL` in `.env.local`.
+- Engines bundled for production via `electron-builder.yml` (`asarUnpack` + `extraResources`).
+- Query engine path is resolved per OS at runtime; respects `@electron-toolkit/utils` platform helpers.
+- On startup, `ensureDatabaseConnection()` runs in `src/main/index.ts`; prod aborts on failure.
+
+# tRPC & IPC Strategy
+- Prefer tRPC for renderer↔main communication of app/domain data:
+  - Server runs in main (`src/main/trpc/*`) with `createHTTPHandler` (standalone adapter).
+  - Transport: HTTP batching for queries/mutations; SSE (`httpSubscriptionLink`) for subscriptions.
+  - Base URL is single-sourced via `VITE_TRPC_HTTP_URL`; keep CSP `connect-src` aligned.
+- Use Electron IPC only for OS/windowing concerns that are not domain data (e.g., window controls, tray actions). Expose minimal, Zod-validated preload APIs.
+- Renderer must not import Node/Electron APIs directly; all domain calls go through tRPC client (`src/renderer/src/lib/trpc.ts`).
+- Keep tRPC context minimal and typed (Prisma client and future per-request metadata). No heavy objects.
+- Subscriptions: prefer SSE for simplicity; only switch to WebSockets if strictly required.
+
+# Release & Ops
+- Package with **electron-builder** → DMG/ZIP for macOS.
+- **Code signing + notarization** required for frictionless installs.
+- **electron-updater** for optional auto-update channel.
+- Crash reporting via **Sentry**; telemetry must be **opt-in**.
+
+# AI Codegen Guardrails
+- ESM-only for source. Exception: preload bundle may emit CommonJS to support `sandbox: true`. Do not use CommonJS elsewhere at runtime.
+- TypeScript strict; avoid `any`. Prefer Zod schemas for runtime boundaries.
+- Keep identifiers, comments, and docs **English-only**. Filenames **kebab-case**.
+- Prefer pure functions, explicit return types, and narrow IPC/preload surfaces.
+- Don’t introduce new libraries without prior approval; prefer extending existing stack.

@@ -1,0 +1,34 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.web.json"
+    }
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["src/main/shared/*"],
+      "@/*": ["src/renderer/src/*"],
+      "@renderer/*": ["src/renderer/src/*"],
+      "@/components/*": ["src/renderer/src/components/*"],
+      "@/lib/*": ["src/renderer/src/lib/*"],
+      "@/hooks/*": ["src/renderer/src/hooks/*"],
+      "@/styles/*": ["src/renderer/src/styles/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "out",
+    "references/**",
+    "context-engineering/**",
+    ".cursor/**",
+    ".gemini/**"
+  ]
+}

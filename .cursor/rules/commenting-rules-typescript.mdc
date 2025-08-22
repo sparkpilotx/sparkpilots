@@ -1,0 +1,76 @@
+---
+alwaysApply: false
+---
+- Focus on intent:
+  - Clearly explain **why** decisions/trade-offs/constraints exist; avoid restating code-obvious behavior.
+  - Emphasize invariants, pre/postconditions, side effects, ownership, concurrency, and resource contracts.
+
+- Placement & scope:
+  - Co-locate comments with corresponding code.
+  - Use **TSDoc** for all exported modules/classes/functions/types.
+  - Inline block comments only for intricate logic.
+  - All public APIs require TSDoc; private members (`_name`) only if complex or non-trivial.
+
+- TSDoc usage (strict):
+  - Always use `/** ... */` with official TSDoc tags.
+  - Standard tags:
+    - `@remarks`, `@param`, `@returns`, `@throws`
+    - `@example`, `@see`, `@deprecated`
+    - `@defaultValue`, `@internal`, `@experimental`
+    - Release tags: `@public`, `@alpha`, `@beta`
+  - Summary line: keep as a single concise sentence.
+  - Examples must be **minimal and runnable** (avoid extraneous code).
+
+- Typing & signatures:
+  - Leverage **TypeScript 5.8.3 features**:
+    - `satisfies`, `using` (ESM disposables), variadic tuples, template literal types, `unique symbol`, `const` assertions.
+  - Use precise types (`readonly`, discriminated unions, branded types).
+  - For generics, document constraints (`extends`), variance, intended usage.
+  - For overloads, document each overload’s preconditions and provide examples.
+
+- Error handling & contracts:
+  - Use `@throws` to document all thrown exceptions; only throw `Error` subclasses (never primitives).
+  - On async APIs: detail `AbortSignal` support, timeout, retry, idempotency contracts.
+
+- Concurrency & I/O:
+  - State execution model—sync/async, event loop details (micro/macro tasks).
+  - For I/O, clarify buffering, partial reads/writes, encoding, and backpressure.
+
+- Performance notes:
+  - Indicate algorithmic complexity, input-size limits, and hot paths.
+  - Document fallback strategies and degraded mode under load.
+
+- Documentation hygiene:
+  - Maintain doc/code parity; update comments alongside code changes.
+  - No secrets, PII, or sensitive data in docs or examples.
+  - Examples must not require network/FS access unless mocked or faked.
+
+- Technical debt/reference notes:
+  - Use:
+    - `// TODO(scope): reason | tracking: URL | deadline: YYYY-MM-DD`
+    - `// HACK: reason | revert criteria | tracking: URL`
+
+- Style guidelines:
+  - English only, concise, declarative, non-duplicative of type annotations.
+  - Max line length: **100 chars**.
+
+- Module-level docs:
+  - TSDoc at the module level should include **Design / Non-goals / Trade-offs**.
+  - Expose API via explicit `export` directives and `@internal`.
+
+- Toolchain integration:
+  - Use **TypeDoc** (TSDoc mode) and `@microsoft/api-extractor`.
+  - Enforce with ESLint (`tsdoc/syntax` rule, `@typescript-eslint`).
+  - CI must fail on TSDoc errors or missing public API docs.
+
+- Testing via examples:
+  - Provide at least one `@example` per public API.
+  - Prefer **Vitest/Jest** inline or plain TS code blocks for examples.
+
+- Deprecation policy:
+  - Use `@deprecated` with migration path and timeline.
+  - Optionally emit development-time warnings.
+
+- Security considerations:
+  - Specify trust boundaries, input validation, escaping policies.
+  - For serialization/deserialization: define format, versioning, and security posture (`safeLoad` vs `parse`).

@@ -1,0 +1,36 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "include": [
+    "src/renderer/**/*",
+    "src/main/shared/**/*",
+    "src/main/trpc/**/*",
+    "src/preload/index.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "out",
+    "references/**",
+    "context-engineering/**",
+    ".cursor/**",
+    ".gemini/**"
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "composite": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["src/main/shared/*"],
+      "@/*": ["src/renderer/src/*"],
+      "@renderer/*": ["src/renderer/src/*"],
+      "@/components/*": ["src/renderer/src/components/*"],
+      "@/lib/*": ["src/renderer/src/lib/*"],
+      "@/hooks/*": ["src/renderer/src/hooks/*"],
+      "@/stores/*": ["src/renderer/src/stores/*"]
+    }
+  }
+}

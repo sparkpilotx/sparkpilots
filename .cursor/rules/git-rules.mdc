@@ -1,0 +1,82 @@
+---
+alwaysApply: false
+---
+
+# Git Development Rules
+
+GitHub client `gh` has been installed
+
+## COMMIT MESSAGE FORMAT
+
+### Conventional Commits Standard
+- **REQUIRED**: Use conventional commits format
+- **Format**: `type(scope): description`
+- **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+
+```bash
+# CORRECT examples
+feat(renderer): add new button component
+fix(main): resolve IPC communication issue
+docs(readme): update installation instructions
+refactor(store): simplify state management logic
+chore(deps): update electron to v37.2.5
+
+# INCORRECT examples
+fixed bug
+update
+new feature
+```
+
+### Commit Message Rules
+- Keep description under 72 characters
+- Use imperative mood ("add" not "added")
+- Reference issues when applicable: `fix(#123): resolve crash`
+- Separate subject from body with blank line
+
+## BRANCH NAMING CONVENTION
+
+### Branch Types
+- **Feature**: `feature/component-name`
+- **Bugfix**: `bugfix/issue-description`
+- **Hotfix**: `hotfix/critical-fix`
+- **Release**: `release/v1.0.0`
+- **Documentation**: `docs/update-guide`
+
+### Naming Rules
+- Use kebab-case for branch names
+- Keep names descriptive but concise
+- Include ticket/issue number if applicable: `feature/123-add-login`
+
+## WORKFLOW RULES
+
+### Before Committing
+- ✅ Run `npm run typecheck` to ensure no TypeScript errors
+- ✅ Test functionality locally
+- ✅ Review changes with `git diff --staged`
+- ❌ Never commit broken code or failing tests
+
+### Branch Management
+- Create feature branches from `main` branch
+- Keep branches focused on single feature/fix
+- Delete merged branches after successful merge
+- Use `git rebase` to keep history clean (avoid on shared branches)
+
+### Pull Request Process
+- Create descriptive PR titles
+- Include clear description of changes
+- Add screenshots for UI changes
+- Request review from team members
+- Address review feedback before merging
+
+## MERGE STRATEGY
+
+### Preferred Methods
+1. **Squash and Merge** - For feature branches (clean history)
+2. **Rebase and Merge** - For maintainable feature branches
+3. **Create Merge Commit** - Only when preserving branch history is important
+
+### Merge Rules
+- Always pull latest `main` before creating PR
+- Resolve conflicts locally before pushing
+- Ensure CI/CD passes before merging
+- Use `--no-ff` for feature merges when appropriate

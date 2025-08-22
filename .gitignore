@@ -1,0 +1,44 @@
+# Generated raster assets from SVG-first pipeline
+src/renderer/public/logo/*.png
+src/renderer/public/logo/*.ico
+src/renderer/public/logo/*.icns
+src/renderer/public/logo/app.iconset/
+
+# Node
+node_modules/
+dist/
+out/
+.DS_Store
+
+# Build artifacts (electron-builder, coverage, caches)
+coverage/
+.nyc_output/
+release/
+build/
+.cache/
+.eslintcache
+.turbo/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor/OS cruft
+.vscode/
+.idea/
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Package managers
+.pnpm-store/
+npm-packages-offline-cache/
+
