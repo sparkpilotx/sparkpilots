@@ -3,6 +3,7 @@ import { nativeImage } from 'electron/common'
 import { existsSync } from 'fs'
 import { join, resolve, basename } from 'path'
 import { platform } from '@electron-toolkit/utils'
+import { openMainWindow, openDashboardWindow, openControlWindow } from './windows/window-factory'
 
 /**
  * Tray utilities for creating and managing the application status bar icon.
@@ -75,6 +76,24 @@ const createTrayImage = (): Electron.NativeImage => {
 
 export const buildDefaultTrayMenu = (): Electron.Menu => {
   return Menu.buildFromTemplate([
+    {
+      label: 'Open Main Window',
+      click: () => {
+        openMainWindow()
+      },
+    },
+    {
+      label: 'Open Dashboard',
+      click: () => {
+        openDashboardWindow()
+      },
+    },
+    {
+      label: 'Open Control Panel',
+      click: () => {
+        openControlWindow()
+      },
+    },
     { type: 'separator' },
     {
       label: 'Quit',

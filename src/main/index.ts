@@ -2,6 +2,8 @@ import { app, BrowserWindow } from 'electron/main'
 import { shell } from 'electron/common'
 import { platform, is } from '@electron-toolkit/utils'
 import { createAppTray, destroyAppTray } from './tray'
+import { ensureDatabaseConnection } from './prisma'
+import { startTrpcServer, stopTrpcServer } from './trpc/server'
 
 /**
  * Main process entry point for SparkPilot
@@ -61,6 +63,20 @@ app.whenReady().then(async () => {
   if (platform.isMacOS) {
     app.dock?.hide()
   }
+   // Verify database connectivity early; non-fatal in development
+   try {
+    await ensureDatabaseConnection()
+  } catch (error) {
+    console.error('Database connectivity check failed:', error)
+    if (!is.dev) {
+      // In production, abort startup if DB is required
+      app.quit()
+      return
+    }
+  }
+
+  // Start tRPC server
+  startTrpcServer()
 
   // Create system tray with dynamic windows menu
   createAppTray()
@@ -79,6 +95,7 @@ app.on('window-all-closed', () => {
 
 // Clean up IPC handlers and stop tRPC server before quitting
 app.on('before-quit', async () => {
+  await stopTrpcServer()
   destroyAppTray()
 })
 
