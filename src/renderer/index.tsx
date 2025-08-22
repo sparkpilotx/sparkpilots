@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@/lib/trpc'
+import { WindowType } from '@shared/window-types'
 
 import './src/styles/globals.css'
 
@@ -13,11 +14,11 @@ import './src/styles/globals.css'
  * reducing memory usage by not bundling unused window apps.
  */
 
-// 从 URL 参数获取窗口类型
+// Get window type from URL parameters
 const urlParams = new URLSearchParams(window.location.search)
-const windowType = urlParams.get('window') || 'main'
+const windowType = (urlParams.get('window') as WindowType) || 'main'
 
-// 动态导入对应的应用组件
+// Dynamically import corresponding app component
 const AppLoader = (): React.JSX.Element => {
   const [AppComponent, setAppComponent] = React.useState<React.ComponentType | null>(null)
   const [loading, setLoading] = React.useState(true)

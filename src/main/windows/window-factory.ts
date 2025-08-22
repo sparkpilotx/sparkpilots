@@ -1,16 +1,7 @@
-import { app, BaseWindow, WebContentsView } from 'electron/main'
+import { BaseWindow, WebContentsView } from 'electron/main'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
-
-export type WindowType = 'main' | 'dashboard' | 'control'
-
-interface WindowConfig {
-  type: WindowType
-  width: number
-  height: number
-  title: string
-  route?: string
-}
+import { WindowType, WindowConfig, WINDOW_DIMENSIONS, getWindowTitle } from '@shared/window-types'
 
 const windows = new Map<WindowType, BaseWindow>()
 
@@ -58,9 +49,9 @@ export const createWindow = (config: WindowConfig): BaseWindow => {
   const [w, h] = window.getContentSize()
   view.setBounds({ x: 0, y: 0, width: w, height: h })
 
-  // 窗口大小固定，无需处理 resize 事件
+  // Window size is fixed, no need to handle resize events
 
-  // 加载对应类型的应用
+  // Load the corresponding application type
   void view.webContents.loadURL(getRendererUrl(config.type))
 
   view.webContents.once('dom-ready', () => {
@@ -80,29 +71,26 @@ export const createWindow = (config: WindowConfig): BaseWindow => {
   return window
 }
 
-// 预定义的窗口配置 (16:9 比例)
+// Predefined window configurations (16:9 aspect ratio)
 export const WindowConfigs: Record<WindowType, WindowConfig> = {
   main: {
     type: 'main',
-    width: 1280,
-    height: 720,
-    title: `${app.getName()} - Main`,
+    ...WINDOW_DIMENSIONS.main,
+    title: getWindowTitle('main'),
   },
   dashboard: {
     type: 'dashboard',
-    width: 960,
-    height: 540,
-    title: `${app.getName()} - Dashboard`,
+    ...WINDOW_DIMENSIONS.dashboard,
+    title: getWindowTitle('dashboard'),
   },
   control: {
     type: 'control',
-    width: 640,
-    height: 360,
-    title: `${app.getName()} - Control`,
+    ...WINDOW_DIMENSIONS.control,
+    title: getWindowTitle('control'),
   },
 }
 
-// 便捷方法
+// Convenience methods
 export const openMainWindow = (): BaseWindow => createWindow(WindowConfigs.main)
 export const openDashboardWindow = (): BaseWindow => createWindow(WindowConfigs.dashboard)
 export const openControlWindow = (): BaseWindow => createWindow(WindowConfigs.control)
