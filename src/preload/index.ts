@@ -14,7 +14,7 @@
  */
 
 import { electronAPI } from '@electron-toolkit/preload'
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge } from 'electron'
 
 // Early appearance application to minimize FOUC
 try {

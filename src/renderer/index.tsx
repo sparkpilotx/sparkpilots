@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@/lib/trpc'
-import { WindowType } from '@shared/window-types'
+import type { WindowType } from '@shared/window-types'
 
 import './src/styles/globals.css'
 
@@ -25,7 +25,7 @@ const AppLoader = (): React.JSX.Element => {
   const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    const loadApp = async () => {
+    const loadApp = async (): Promise<void> => {
       try {
         let module: { default: React.ComponentType }
         switch (windowType) {

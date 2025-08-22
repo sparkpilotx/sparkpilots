@@ -25,11 +25,21 @@ const rootRoute = createRootRouteWithContext<RouterContext>()({
           <div className="mx-auto flex max-w-screen-md items-center justify-between px-4 py-3">
             <div className="text-sm font-medium">Sparkpilot</div>
             <nav className="app-region-no-drag flex items-center gap-4 text-xs text-muted-foreground">
-              <Link to="/" className="hover:text-foreground">Home</Link>
-              <Link to="/hello" search={{ name: 'Simon' }} className="hover:text-foreground">Hello</Link>
-              <Link to="/ticks" className="hover:text-foreground">Ticks</Link>
-              <Link to="/db" className="hover:text-foreground">DB</Link>
-              <Link to="/letters" search={{ pageSize: 3 }} className="hover:text-foreground">Letters</Link>
+              <Link to="/" className="hover:text-foreground">
+                Home
+              </Link>
+              <Link to="/hello" search={{ name: 'Simon' }} className="hover:text-foreground">
+                Hello
+              </Link>
+              <Link to="/ticks" className="hover:text-foreground">
+                Ticks
+              </Link>
+              <Link to="/db" className="hover:text-foreground">
+                DB
+              </Link>
+              <Link to="/letters" search={{ pageSize: 3 }} className="hover:text-foreground">
+                Letters
+              </Link>
             </nav>
           </div>
         </div>
@@ -66,9 +76,7 @@ const helloRoute = createRoute({
   loader: async ({ context, location }) => {
     const search = location.search as z.infer<typeof helloSearchSchema>
     const name = search.name ?? 'World'
-    await context.queryClient.ensureQueryData(
-      trpc.helloTrpc.helloWithName.queryOptions({ name }),
-    )
+    await context.queryClient.ensureQueryData(trpc.helloTrpc.helloWithName.queryOptions({ name }))
     await context.queryClient.ensureQueryData(trpc.helloTrpc.time.queryOptions())
     return null
   },
@@ -147,12 +155,7 @@ const lettersRoute = createRoute({
   validateSearch: (search) => lettersSearch.parse(search),
   component: function LettersRoute(): React.JSX.Element {
     const { pageSize } = useSearch({ from: lettersRoute.id }) as z.infer<typeof lettersSearch>
-    const {
-      data,
-      isFetchingNextPage,
-      hasNextPage,
-      fetchNextPage,
-    } = useInfiniteQuery({
+    const { data, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteQuery({
       queryKey: ['letters', pageSize],
       initialPageParam: undefined as string | undefined,
       queryFn: async ({ pageParam }) =>
@@ -184,15 +187,7 @@ const lettersRoute = createRoute({
   },
 })
 
-
-
-const routeTree = rootRoute.addChildren([
-  indexRoute,
-  helloRoute,
-  ticksRoute,
-  dbRoute,
-  lettersRoute,
-])
+const routeTree = rootRoute.addChildren([indexRoute, helloRoute, ticksRoute, dbRoute, lettersRoute])
 
 const router = createRouter({
   routeTree,

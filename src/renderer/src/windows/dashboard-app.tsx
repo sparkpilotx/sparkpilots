@@ -41,7 +41,7 @@ function SystemStatus(): React.JSX.Element {
     <div className="grid grid-cols-2 gap-3 text-xs">
       <div>
         <div className="text-muted-foreground">Database</div>
-        <div className={dbHealth?.ok ? "text-green-600" : "text-red-600"}>
+        <div className={dbHealth?.ok ? 'text-green-600' : 'text-red-600'}>
           {dbHealth?.ok ? `OK (${dbHealth.durationMs}ms)` : 'Error'}
         </div>
       </div>
@@ -75,11 +75,7 @@ function LiveTicks(): React.JSX.Element {
       ))}
       <div className="flex h-6 items-end gap-1">
         {ticks.slice(-15).map((_, i) => (
-          <div
-            key={i}
-            className="w-1 bg-primary"
-            style={{ height: `${10 + (i % 4) * 5}px` }}
-          />
+          <div key={i} className="w-1 bg-primary" style={{ height: `${10 + (i % 4) * 5}px` }} />
         ))}
       </div>
     </div>

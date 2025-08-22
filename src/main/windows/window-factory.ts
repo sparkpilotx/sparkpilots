@@ -1,7 +1,8 @@
 import { BaseWindow, WebContentsView } from 'electron/main'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
-import { WindowType, WindowConfig, WINDOW_DIMENSIONS, getWindowTitle } from '@shared/window-types'
+import type { WindowType, WindowConfig } from '@shared/window-types'
+import { WINDOW_DIMENSIONS, getWindowTitle } from '@shared/window-types'
 
 const windows = new Map<WindowType, BaseWindow>()
 
@@ -9,10 +10,9 @@ const getPreloadPath = (): string => join(__dirname, '../preload/index.cjs')
 
 const getRendererUrl = (windowType: WindowType): string => {
   const devUrl = process.env.ELECTRON_RENDERER_URL
-  const baseUrl = devUrl && is.dev 
-    ? devUrl 
-    : new URL('../renderer/index.html', `file://${__dirname}/`).toString()
-  
+  const baseUrl =
+    devUrl && is.dev ? devUrl : new URL('../renderer/index.html', `file://${__dirname}/`).toString()
+
   // 通过查询参数指定窗口类型
   return `${baseUrl}?window=${windowType}#/`
 }

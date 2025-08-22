@@ -63,8 +63,8 @@ app.whenReady().then(async () => {
   if (platform.isMacOS) {
     app.dock?.hide()
   }
-   // Verify database connectivity early; non-fatal in development
-   try {
+  // Verify database connectivity early; non-fatal in development
+  try {
     await ensureDatabaseConnection()
   } catch (error) {
     console.error('Database connectivity check failed:', error)
@@ -94,9 +94,11 @@ app.on('window-all-closed', () => {
 })
 
 // Clean up IPC handlers and stop tRPC server before quitting
-app.on('before-quit', async () => {
-  await stopTrpcServer()
-  destroyAppTray()
+app.on('before-quit', () => {
+  void (async () => {
+    await stopTrpcServer()
+    destroyAppTray()
+  })()
 })
 
 // Security: Prevent unauthorized navigation and redirect to external browser

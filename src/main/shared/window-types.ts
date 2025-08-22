@@ -1,6 +1,6 @@
 /**
  * Window system shared type definitions
- * 
+ *
  * These types are used in both main and renderer processes:
  * - main: window factory creates and manages windows
  * - renderer: loads corresponding app components based on window type
@@ -37,7 +37,7 @@ export const WINDOW_DIMENSIONS = {
 export const getWindowTitle = (type: WindowType): string => {
   const typeMap: Record<WindowType, string> = {
     main: 'Main',
-    dashboard: 'Dashboard', 
+    dashboard: 'Dashboard',
     control: 'Control',
   }
   return `${import.meta.env.VITE_APP_NAME} - ${typeMap[type]}`
